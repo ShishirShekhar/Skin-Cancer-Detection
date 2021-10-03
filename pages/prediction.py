@@ -3,13 +3,12 @@
 # Import necessary modules
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
 
 import tensorflow as tf
-from tensorflow import keras
 from tensorflow.keras import preprocessing
-
 from PIL import Image
+
+from model import load_model
 
 def app():
     """This funciton runs the prediction page"""
@@ -32,17 +31,20 @@ def app():
     # Create a button to get the prediction values on click
     if (st.button("Predict")):
         # load the model
-        model = keras.models.load_model(".\SkinCancer.h5")
+        model = load_model()
 
         # predict value
         pred_value = ""
         prediction = model.predict(img)
 
-        if (np.max(prediction) < 0.90):
+        if (np.max(prediction) < 0.95):
             pred_value = "Cancer not detected"
         else:
             pred_value = label[np.argmax(prediction)]
 
         # Show prediction values
-        st.success("Prediction successful!!!")
-        st.success(f"Predicted Skin Cancer is '{pred_value}'")
+        if not (pred_value == "Cancer not detected"):
+            st.success("Prediction successful!!!")
+            st.success(f"Predicted Skin Cancer is '{pred_value}'")
+        else:
+            st.error(f'{pred_value}!!!')
